@@ -9,6 +9,11 @@ const generateAvatar = (email: string, style: string = 'bottts') => {
   return `https://api.dicebear.com/7.x/${style}/svg?seed=${email}&backgroundColor=b6e3f4,c0aede,d1d4f9`;
 };
 
+export const APPROVED_EMAILS = [
+  'admin@example.com',
+  // Add other approved emails here
+];
+
 export const authOptions: AuthOptions = {
   providers: [
     CredentialsProvider({
