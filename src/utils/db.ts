@@ -8,8 +8,6 @@ if (!MONGODB_URI) {
   );
 }
 
-const uri: string = MONGODB_URI;
-
 let cached = global.mongoose;
 
 if (!cached) {
@@ -27,9 +25,9 @@ async function connectDB() {
     };
 
     try {
-      cached.promise = mongoose.connect(uri, opts).then((mongoose) => {
+      cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
         console.log('Connected to MongoDB successfully');
-        return { conn: mongoose, promise: cached.promise };
+        return mongoose;
       });
     } catch (error) {
       console.error('Failed to connect to MongoDB:', error);
