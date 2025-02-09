@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import connectDB from '@/utils/db';
-import Challenge, { ChallengeDocument } from '@/models/challenge';
+import Challenge from '@/models/challenge';
 import { isValidObjectId } from 'mongoose';
 
 export async function DELETE(req: Request) {
