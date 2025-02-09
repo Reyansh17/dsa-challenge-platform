@@ -7,11 +7,14 @@ import { ADMIN_CREDENTIALS } from '@/config/admin';
 export async function DELETE(req: Request) {
   try {
     const session = await getServerSession();
+    console.log('Session:', session);
+
     if (!session?.user?.email || session.user.email !== ADMIN_CREDENTIALS.email) {
-      return NextResponse.json(
-        { error: 'Unauthorized: Only admin can delete challenges' },
-        { status: 401 }
-      );
+      console.log('Unauthorized - User:', session?.user);
+      return NextResponse.json({ 
+        error: 'Unauthorized - Admin access required',
+        status: 401 
+      });
     }
 
     await connectDB();
