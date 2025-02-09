@@ -3,6 +3,8 @@ import { getServerSession } from 'next-auth';
 import connectDB from '@/utils/db';
 import Challenge from '@/models/challenge';
 import { authOptions } from '@/config/auth';
+import { Types } from 'mongoose';
+
 
 export async function GET() {
   try {
@@ -34,14 +36,14 @@ export async function GET() {
     .lean();
 
     // Format challenges and check completion status
-    const formattedChallenges = challenges.map(challenge => ({
-      _id: challenge._id.toString(),
+    const formattedChallenges = challenges.map((challenge) => ({
+      _id: (challenge._id as Types.ObjectId).toString(),
       leetcodeLink: challenge.leetcodeLink,
       difficulty: challenge.difficulty,
-      createdAt: challenge.createdAt.toISOString(),
+      createdAt: (challenge.createdAt as Date).toISOString(),
       submissions: challenge.submissions || [],
       isCompleted: challenge.submissions?.some(
-        sub => sub.userId?.email === session.user.email
+        (sub: { userId?: { email: string } }) => sub.userId?.email === session.user.email
       ) || false
     }));
 

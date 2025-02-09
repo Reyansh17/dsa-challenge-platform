@@ -4,7 +4,7 @@ import { signIn, useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { ADMIN_CREDENTIALS } from '@/config/admin';
-import Image from 'next/image';
+
 
 function GoogleIcon() {
   return (

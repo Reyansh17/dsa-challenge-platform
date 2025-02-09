@@ -2,14 +2,41 @@
 
 import { useSession, signOut } from 'next-auth/react';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { usePathname } from 'next/navigation';
+import { useState, useEffect, useCallback } from 'react';
+import Image from 'next/image';
 
 export default function Navbar() {
-  const { data: session, status } = useSession();
+  const { data: session, status, update: updateSession } = useSession();
   const pathname = usePathname();
-  const router = useRouter();
+  
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [profileVersion, setProfileVersion] = useState(0);
+
+  const refreshProfile = useCallback(async () => {
+    if (status === 'authenticated') {
+      try {
+        const updatedSession = await updateSession();
+        setProfileVersion(v => v + 1);
+        return updatedSession;
+      } catch (error) {
+        console.error('Error updating session:', error);
+      }
+    }
+  }, [status, updateSession]);
+
+  // Refresh on mount and pathname change
+  useEffect(() => {
+    refreshProfile();
+  }, [refreshProfile, pathname]);
+
+  // Continuous refresh on profile page
+  useEffect(() => {
+    if (pathname === '/profile') {
+      const interval = setInterval(refreshProfile, 500); // More frequent updates
+      return () => clearInterval(interval);
+    }
+  }, [pathname, refreshProfile]);
 
   const handleLogout = async () => {
     try {
@@ -20,6 +47,18 @@ export default function Navbar() {
     } catch (error) {
       console.error('Error during logout:', error);
     }
+  };
+
+  // Handle profile menu click
+  const handleProfileClick = async () => {
+    await refreshProfile();
+    setShowProfileMenu(!showProfileMenu);
+  };
+
+  // Handle profile link click
+  const handleProfileLinkClick = async () => {
+    setShowProfileMenu(false);
+    await refreshProfile();
   };
 
   return (
@@ -39,19 +78,24 @@ export default function Navbar() {
             {status === 'authenticated' && session?.user ? (
               <div className="relative">
                 <button
-                  onClick={() => setShowProfileMenu(!showProfileMenu)}
+                  onClick={handleProfileClick}
                   className="flex items-center gap-2 focus:outline-none group"
                 >
                   <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center ring-2 ring-gray-700 overflow-hidden">
-                    {session.user.avatar ? (
-                      <img
-                        src={session.user.avatar}
+                    {session?.user?.image ? (
+                      <Image
+                        key={`${profileVersion}-${session.user.image}`}
+                        src={session.user.image}
                         alt={session.user.name || 'Profile'}
+                        width={32}
+                        height={32}
                         className="w-full h-full object-cover"
+                        priority
+                        unoptimized={true}
                       />
                     ) : (
-                      <span className="text-white text-sm font-medium">
-                        {session.user.name?.charAt(0).toUpperCase() || 'U'}
+                      <span key={profileVersion} className="text-white text-sm font-medium">
+                        {session?.user?.name?.charAt(0).toUpperCase() || 'U'}
                       </span>
                     )}
                   </div>
@@ -60,7 +104,7 @@ export default function Navbar() {
                       ? 'bg-blue-600 text-white'
                       : 'text-gray-300 group-hover:bg-gray-800 group-hover:text-white'
                   }`}>
-                    {session.user.name || 'Profile'}
+                    {session?.user?.name || 'Profile'}
                   </span>
                 </button>
 
@@ -70,7 +114,7 @@ export default function Navbar() {
                       <Link
                         href="/profile"
                         className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                        onClick={() => setShowProfileMenu(false)}
+                        onClick={handleProfileLinkClick}
                       >
                         View Profile
                       </Link>

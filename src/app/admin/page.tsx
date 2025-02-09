@@ -158,7 +158,7 @@ export default function AdminDashboard() {
               <div className="text-center py-12">
                 <div className="text-gray-400 text-lg mb-2">No challenges posted yet</div>
                 <div className="text-gray-500 text-sm">
-                  Click the "Post New Challenge" button to add your first challenge
+                  Click the Post New Challenge button to add your first challenge
                 </div>
               </div>
             )}
