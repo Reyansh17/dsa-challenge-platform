@@ -11,11 +11,11 @@ export async function POST(req: Request) {
     // Log session for debugging
     console.log('Session:', session);
 
-    if (!session?.user?.email || !session.user.isAdminToday) {
+    if (!session?.user?.email || session.user.role !== 'admin') {
       console.log('Unauthorized - User:', session?.user);
       return NextResponse.json({ 
         error: 'Unauthorized - Admin access required',
-        details: { isAdmin: session?.user?.isAdminToday }
+        details: { role: session?.user?.role }
       }, { status: 401 });
     }
 

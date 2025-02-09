@@ -5,8 +5,8 @@ import Challenge from '@/models/challenge';
 
 export async function DELETE(req: Request) {
   try {
-    const cookieStore = await cookies();
-    const adminSession = cookieStore.get('adminSession');
+    const cookieStore = cookies();
+    const adminSession = await Promise.resolve(cookieStore.get('adminSession'));
 
     if (!adminSession || adminSession.value !== 'true') {
       return NextResponse.json(

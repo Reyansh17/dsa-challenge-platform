@@ -4,11 +4,6 @@ import connectDB from '@/utils/db';
 import Challenge from '@/models/challenge';
 import User from '@/models/user';
 
-interface Submission {
-  user: { toString: () => string };
-  completed: boolean;
-}
-
 export async function POST(req: Request) {
   try {
     const session = await getServerSession();
@@ -20,10 +15,6 @@ export async function POST(req: Request) {
     const { challengeId, completed } = await req.json();
 
     const user = await User.findOne({ email: session.user.email });
-    if (!user) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
-    }
-
     const challenge = await Challenge.findById(challengeId);
 
     if (!challenge) {
@@ -35,7 +26,7 @@ export async function POST(req: Request) {
 
     // Update or create submission
     const submissionIndex = challenge.submissions.findIndex(
-      (s: Submission) => s.user.toString() === user._id.toString()
+      (s: any) => s.user.toString() === user._id.toString()
     );
 
     if (submissionIndex > -1) {
