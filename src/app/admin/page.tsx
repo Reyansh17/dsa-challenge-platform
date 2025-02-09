@@ -68,32 +68,6 @@ export default function AdminDashboard() {
     });
   };
 
-  const handleDelete = async (challengeId: string) => {
-    if (!confirm('Are you sure you want to delete this challenge?')) {
-      return;
-    }
-
-    try {
-      const response = await fetch(`/api/admin/delete-challenge?id=${challengeId}`, {
-        method: 'DELETE',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
-
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || 'Failed to delete challenge');
-      }
-
-      fetchChallenges();
-    } catch (error) {
-      console.error('Error deleting challenge:', error);
-      alert('Failed to delete challenge. Please try again.');
-    }
-  };
-
   if (status === 'loading' || isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-pink-100 to-pink-200 flex items-center justify-center">
@@ -175,12 +149,6 @@ export default function AdminDashboard() {
                     <span className="text-sm text-gray-500">
                       {challenge.submissions?.length || 0} submissions
                     </span>
-                    <button
-                      onClick={() => handleDelete(challenge._id)}
-                      className="text-red-600 hover:text-red-800"
-                    >
-                      Delete
-                    </button>
                   </div>
                 </div>
               </div>

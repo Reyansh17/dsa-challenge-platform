@@ -5,6 +5,10 @@ import connectDB from '@/utils/db';
 import User from '@/models/user';
 import { ADMIN_CREDENTIALS } from './admin';
 
+const generateAvatar = (email: string, style: string = 'bottts') => {
+  return `https://api.dicebear.com/7.x/${style}/svg?seed=${email}&backgroundColor=b6e3f4,c0aede,d1d4f9`;
+};
+
 export const APPROVED_EMAILS = [
   'admin@example.com',
   // Add other approved emails here
@@ -29,7 +33,9 @@ export const authOptions: AuthOptions = {
             id: 'admin',
             email: ADMIN_CREDENTIALS.email,
             name: 'Admin',
-            role: 'admin'
+            role: 'admin',
+            avatar: generateAvatar('admin'),
+            avatarStyle: 'bottts'
           };
         }
         return null;
@@ -46,7 +52,7 @@ export const authOptions: AuthOptions = {
     })
   ],
   callbacks: {
-    async signIn({ user }) {
+    async signIn({ user, account, profile }) {
       try {
         await connectDB();
 
@@ -55,9 +61,11 @@ export const authOptions: AuthOptions = {
         }
 
         // Check if admin email
-        if (user.email === ADMIN_CREDENTIALS.email || APPROVED_EMAILS.includes(user.email)) {
+        if (user.email === ADMIN_CREDENTIALS.email) {
           user.role = 'admin';
-          user.name = user.name || 'Admin';
+          user.name = 'Admin';
+          user.avatar = generateAvatar('admin');
+          user.avatarStyle = 'bottts';
           return true;
         }
 
@@ -65,10 +73,13 @@ export const authOptions: AuthOptions = {
         let dbUser = await User.findOne({ email: user.email });
         
         if (!dbUser) {
+          const avatar = generateAvatar(user.email);
           dbUser = await User.create({
             email: user.email,
             name: user.name || user.email.split('@')[0],
             role: 'user',
+            avatarStyle: 'bottts',
+            avatar,
             totalProblemsSolved: 0,
             easySolved: 0,
             mediumSolved: 0,
@@ -79,6 +90,8 @@ export const authOptions: AuthOptions = {
         user.id = dbUser._id.toString();
         user.name = dbUser.name;
         user.role = dbUser.role;
+        user.avatar = dbUser.avatar;
+        user.avatarStyle = dbUser.avatarStyle;
 
         return true;
       } catch (error) {
@@ -91,6 +104,8 @@ export const authOptions: AuthOptions = {
         token.id = user.id;
         token.role = user.role;
         token.name = user.name;
+        token.avatar = user.avatar;
+        token.avatarStyle = user.avatarStyle;
       }
       return token;
     },
@@ -99,6 +114,8 @@ export const authOptions: AuthOptions = {
         session.user.id = token.id as string;
         session.user.role = token.role as string;
         session.user.name = token.name as string;
+        session.user.avatar = token.avatar as string;
+        session.user.avatarStyle = token.avatarStyle as string;
       }
       return session;
     }
