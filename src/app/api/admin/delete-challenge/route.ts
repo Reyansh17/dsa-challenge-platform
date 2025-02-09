@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import connectDB from '@/utils/db';
 import Challenge from '@/models/challenge';
+import { ADMIN_CREDENTIALS } from '@/config/admin';
 
 export async function DELETE(req: Request) {
   try {
