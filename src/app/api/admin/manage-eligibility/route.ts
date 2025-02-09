@@ -7,9 +7,9 @@ import { APPROVED_EMAILS } from '@/config/auth';
 export async function POST(req: Request) {
   try {
     const session = await getServerSession();
-    if (!session?.user?.email || !APPROVED_EMAILS.SUPER_ADMINS.includes(session.user.email)) {
+    if (!session?.user?.email || !APPROVED_EMAILS.includes(session.user.email)) {
       return NextResponse.json(
-        { error: 'Unauthorized: Only super admins can manage eligibility' },
+        { error: 'Unauthorized: Only admins can manage eligibility' },
         { status: 401 }
       );
     }
@@ -55,9 +55,9 @@ export async function POST(req: Request) {
 export async function GET(req: Request) {
   try {
     const session = await getServerSession();
-    if (!session?.user?.email || !APPROVED_EMAILS.SUPER_ADMINS.includes(session.user.email)) {
+    if (!session?.user?.email || !APPROVED_EMAILS.includes(session.user.email)) {
       return NextResponse.json(
-        { error: 'Unauthorized: Only super admins can view eligibility' },
+        { error: 'Unauthorized: Only admins can view eligibility' },
         { status: 401 }
       );
     }
