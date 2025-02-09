@@ -63,6 +63,10 @@ const userSchema = new mongoose.Schema({
   },
   avatar: {
     type: String
+  },
+  isEligibleForAdmin: {
+    type: Boolean,
+    default: false
   }
 });
 
