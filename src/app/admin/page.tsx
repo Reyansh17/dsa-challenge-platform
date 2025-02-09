@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import { ADMIN_CREDENTIALS } from '@/config/admin';
 import PostChallengeModal from '@/components/PostChallengeModal';
 import type { Challenge } from '@/types/challenge';
+import { toast } from 'react-hot-toast';
 
 export default function AdminDashboard() {
   const { data: session, status } = useSession();
@@ -66,6 +67,29 @@ export default function AdminDashboard() {
       minute: '2-digit',
       hour12: true
     });
+  };
+
+  const handleDelete = async (challengeId: string) => {
+    if (!confirm('Are you sure you want to delete this challenge?')) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/admin/delete-challenge?id=${challengeId}`, {
+        method: 'DELETE',
+        credentials: 'include'
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete challenge');
+      }
+
+      setChallenges(challenges.filter(challenge => challenge._id !== challengeId));
+      toast.success('Challenge deleted successfully');
+    } catch (error) {
+      console.error('Error deleting challenge:', error);
+      toast.error('Failed to delete challenge');
+    }
   };
 
   if (status === 'loading' || isLoading) {
@@ -149,6 +173,14 @@ export default function AdminDashboard() {
                     <span className="text-sm text-gray-500">
                       {challenge.submissions?.length || 0} submissions
                     </span>
+                    <button
+                      onClick={() => handleDelete(challenge._id)}
+                      className="text-red-600 hover:text-red-800 transition-colors p-2 rounded-full hover:bg-red-50"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
+                      </svg>
+                    </button>
                   </div>
                 </div>
               </div>
