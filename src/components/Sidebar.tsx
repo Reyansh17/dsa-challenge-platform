@@ -52,7 +52,7 @@ export default function Sidebar() {
           <div className="w-8 h-8 bg-[#ffd4d4] rounded-lg flex items-center justify-center">
             <span className="text-[#ff6b6b] text-lg">🎯</span>
           </div>
-          <span className="text-xl font-semibold text-[#2d3436]">DSA Challenge</span>
+          <span className="text-xl font-semibold text-[#2d3436]">Leet Daily 🧑🏻‍💻</span>
         </div>
 
         {/* Profile Section */}

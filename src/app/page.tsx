@@ -88,7 +88,7 @@ export default function Home() {
         <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8">
           <div className="text-center mb-8">
             <h2 className="text-3xl font-bold text-gray-900 mb-2">Welcome</h2>
-            <p className="text-gray-600">Sign in to continue to DSA Challenge</p>
+            <p className="text-gray-600">Sign in to continue to LeetDaily</p>
           </div>
 
           {!showAdminLogin ? (
