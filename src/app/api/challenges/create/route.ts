@@ -21,6 +21,16 @@ export async function POST(req: Request) {
     await connectDB();
     const data = await req.json();
 
+    // Check if challenge already exists
+    const existingChallenge = await Challenge.findOne({ leetcodeLink: data.leetcodeLink });
+    if (existingChallenge) {
+      return NextResponse.json({ 
+        error: 'Challenge with this LeetCode link already exists' 
+      }, { 
+        status: 400 
+      });
+    }
+
     const challenge = await Challenge.create({
       leetcodeLink: data.leetcodeLink,
       difficulty: data.difficulty,
@@ -39,6 +49,12 @@ export async function POST(req: Request) {
     return response;
   } catch (error) {
     console.error('Error creating challenge:', error);
+    if ((error as any).code === 11000) {
+      return NextResponse.json(
+        { error: 'Challenge with this LeetCode link already exists' },
+        { status: 400 }
+      );
+    }
     return NextResponse.json(
       { error: 'Failed to create challenge' },
       { status: 500 }

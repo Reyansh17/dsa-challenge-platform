@@ -111,11 +111,18 @@ export const authOptions: AuthOptions = {
     },
     async session({ session, token }) {
       if (session?.user) {
-        session.user.id = token.id as string;
-        session.user.role = token.role as string;
-        session.user.name = token.name as string;
-        session.user.avatar = token.avatar as string;
-        session.user.avatarStyle = token.avatarStyle as string;
+        session.user = {
+          id: token.id as string,
+          name: token.name as string,
+          email: token.email as string,
+          image: token.picture as string,
+          totalProblemsSolved: 0,
+          easySolved: 0, 
+          mediumSolved: 0,
+          hardSolved: 0,
+          isAdminToday: false,
+          isEligibleForAdmin: false
+        };
       }
       return session;
     }
