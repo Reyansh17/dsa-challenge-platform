@@ -1,32 +1,45 @@
 import { NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
+import { getServerSession } from 'next-auth';
 import connectDB from '@/utils/db';
 import Challenge from '@/models/challenge';
+import { ADMIN_CREDENTIALS } from '@/config/admin';
 
 export async function DELETE(req: Request) {
   try {
-    const cookieStore = cookies();
-    const adminSession = await Promise.resolve(cookieStore.get('adminSession'));
+    const session = await getServerSession();
+    
+    if (!session?.user?.email || session.user.email !== ADMIN_CREDENTIALS.email) {
+      return NextResponse.json({ 
+        error: 'Unauthorized - Admin access required'
+      }, { 
+        status: 401 
+      });
+    }
 
-    if (!adminSession || adminSession.value !== 'true') {
+    await connectDB();
+    const { searchParams } = new URL(req.url);
+    const challengeId = searchParams.get('id');
+
+    if (!challengeId) {
       return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
+        { error: 'Challenge ID is required' },
+        { status: 400 }
       );
     }
 
-    const { challengeId } = await req.json();
-    await connectDB();
-
-    const result = await Challenge.findByIdAndDelete(challengeId);
-    if (!result) {
+    const deletedChallenge = await Challenge.findByIdAndDelete(challengeId);
+    
+    if (!deletedChallenge) {
       return NextResponse.json(
         { error: 'Challenge not found' },
         { status: 404 }
       );
     }
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({
+      success: true,
+      message: 'Challenge deleted successfully'
+    });
   } catch (error) {
     console.error('Error deleting challenge:', error);
     return NextResponse.json(
