@@ -40,16 +40,22 @@ export async function DELETE(req: Request) {
     // Return success response
     return NextResponse.json({
       success: true,
-      message: 'Challenge deleted successfully'
+      message: 'Challenge deleted successfully',
     });
   } catch (error) {
     // Log the error with context
     console.error(`Error deleting challenge:`, error);
 
+    // Type guard to check if error is an instance of Error
+    let errorMessage = 'An unexpected error occurred';
+    if (error instanceof Error) {
+      errorMessage = error.message;
+    }
+
     // Return an appropriate error response
     if (process.env.NODE_ENV === 'development') {
       return NextResponse.json(
-        { error: 'Failed to delete challenge', details: error.message },
+        { error: 'Failed to delete challenge', details: errorMessage },
         { status: 500 }
       );
     } else {
