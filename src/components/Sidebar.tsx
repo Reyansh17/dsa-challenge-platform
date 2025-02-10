@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useSession, signOut } from 'next-auth/react';
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 
 export default function Sidebar() {
   const pathname = usePathname();
@@ -48,11 +49,25 @@ export default function Sidebar() {
     <div className="fixed left-0 top-0 w-64 h-screen bg-white p-6 overflow-y-auto">
       <div className="space-y-6">
         {/* Logo Section */}
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-[#ffd4d4] rounded-lg flex items-center justify-center">
-            <span className="text-[#ff6b6b] text-lg">🎯</span>
+        <div className="flex items-center gap-3">
+          <div className="flex items-center">
+            <Image
+              src="/leetcode.svg"
+              alt="Leet Daily Logo"
+              width={32}
+              height={32}
+              className="w-8 h-8"
+            />
           </div>
-          <span className="text-xl font-semibold text-[#2d3436]">Leet Daily 🧑🏻‍💻</span>
+          <div className="flex items-center gap-2">
+            <span className="text-xl font-bold bg-gradient-to-r from-pink-500 to-orange-500 bg-clip-text text-transparent">
+              Leet
+            </span>
+            <span className="text-xl font-semibold text-gray-700">
+              Daily
+            </span>
+            
+          </div>
         </div>
 
         {/* Profile Section */}
