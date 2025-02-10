@@ -19,7 +19,9 @@ export default function PostChallengeModal({ onClose, onSuccess }: PostChallenge
       return false;
     }
 
-    const leetcodeUrlPattern = /^https?:\/\/(www\.)?leetcode\.com\/problems\/[\w-]+\/?$/;
+    const leetcodeUrlPattern = /^https?:\/\/(www\.)?leetcode\.com\/problems\/[\w-]+(\/description\/?)?$/;
+
+
     if (!leetcodeUrlPattern.test(leetcodeLink)) {
       setError('Please enter a valid LeetCode problem URL');
       return false;
