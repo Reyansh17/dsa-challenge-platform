@@ -1,11 +1,14 @@
 import type { Metadata } from 'next';
 import AuthProvider from '@/components/AuthProvider';
-import Navbar from '@/components/Navbar';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'DSA Challenge Platform',
-  description: 'A platform for daily DSA challenges.',
+  title: 'Leet Daily',
+  description: 'Daily coding challenges to improve your problem-solving skills',
+  icons: {
+    icon: '/favicon.ico',
+    apple: '/apple-touch-icon.png',
+  },
 };
 
 export default function RootLayout({
@@ -17,7 +20,6 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <AuthProvider>
-          
           {children}
         </AuthProvider>
       </body>

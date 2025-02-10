@@ -62,8 +62,8 @@ export default function Home() {
     }
   };
 
-  const handleGoogleSignIn = () => {
-    signIn('google', { callbackUrl: '/dashboard' });
+  const handleSignIn = () => {
+    signIn('google');
   };
 
   if (status === 'loading') {
@@ -79,83 +79,131 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-100 to-pink-200 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md">
-        {/* Logo and Title */}
-        <div className="flex flex-col items-center mb-8">
-          <div className="flex items-center gap-3 mb-4">
-            <Image
-              src="/leetcode.svg"
-              alt="Leet Daily Logo"
-              width={40}
-              height={40}
-              className="w-10 h-10"
-            />
-            <div className="flex items-center gap-2">
-              <span className="text-2xl font-bold bg-gradient-to-r from-pink-500 to-orange-500 bg-clip-text text-transparent">
-                Leet
-              </span>
-              <span className="text-2xl font-semibold text-gray-700">
-                Daily
-              </span>
+    <div className="min-h-screen bg-gradient-to-br from-pink-100 to-pink-200">
+      <div className="flex items-center justify-center p-4 min-h-screen">
+        <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8">
+          {/* Logo and Title */}
+          <div className="flex flex-col items-center mb-8">
+            <div className="flex items-center gap-3 mb-4">
+              <Image
+                src="/leetcode.svg"
+                alt="Leet Daily Logo"
+                width={40}
+                height={40}
+                className="w-10 h-10"
+              />
+              <div className="flex items-center gap-2">
+                <span className="text-2xl font-bold bg-gradient-to-r from-pink-500 to-orange-500 bg-clip-text text-transparent">
+                  Leet
+                </span>
+                <span className="text-2xl font-semibold text-gray-700">
+                  Daily
+                </span>
+              </div>
             </div>
+            <p className="text-gray-600 text-center">
+              Daily coding challenges to improve your problem-solving skills
+            </p>
           </div>
-          <p className="text-gray-600 text-center">
-            Daily coding challenges to improve your problem-solving skills
-          </p>
-        </div>
 
-        {/* Sign In Button */}
-        <button
-          onClick={handleGoogleSignIn}
-          className="w-full bg-white border border-gray-300 rounded-lg px-6 py-3 flex items-center justify-center gap-3 hover:bg-gray-50 transition-colors"
-        >
-          <Image
-            src="/google.svg"
-            alt="Google Logo"
-            width={20}
-            height={20}
-            className="w-5 h-5"
-          />
-          <span className="text-gray-700 font-medium">
-            Continue with Google
-          </span>
-        </button>
+          {!showAdminLogin ? (
+            <>
+              <button
+                onClick={handleSignIn}
+                className="w-full flex items-center justify-center gap-3 py-3 px-4 bg-white border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors duration-200"
+              >
+                <GoogleIcon />
+                Continue with Google
+              </button>
 
-        {/* Features */}
-        <div className="mt-8 space-y-4">
-          <div className="flex items-start gap-3">
-            <div className="w-6 h-6 rounded-full bg-pink-100 flex items-center justify-center flex-shrink-0">
-              <span className="text-pink-600 text-sm">✓</span>
-            </div>
-            <div>
-              <h3 className="font-medium text-gray-900">Daily Challenges</h3>
-              <p className="text-sm text-gray-600">
-                New coding problems every day to keep you sharp
-              </p>
-            </div>
-          </div>
-          <div className="flex items-start gap-3">
-            <div className="w-6 h-6 rounded-full bg-pink-100 flex items-center justify-center flex-shrink-0">
-              <span className="text-pink-600 text-sm">✓</span>
-            </div>
-            <div>
-              <h3 className="font-medium text-gray-900">Track Progress</h3>
-              <p className="text-sm text-gray-600">
-                Monitor your improvement with detailed statistics
-              </p>
-            </div>
-          </div>
-          <div className="flex items-start gap-3">
-            <div className="w-6 h-6 rounded-full bg-pink-100 flex items-center justify-center flex-shrink-0">
-              <span className="text-pink-600 text-sm">✓</span>
-            </div>
-            <div>
-              <h3 className="font-medium text-gray-900">Compete & Learn</h3>
-              <p className="text-sm text-gray-600">
-                Join the leaderboard and learn from others
-              </p>
-            </div>
+              <button
+                onClick={() => setShowAdminLogin(true)}
+                className="mt-4 w-full text-sm text-gray-500 hover:text-gray-700"
+              >
+                Admin Login
+              </button>
+
+              {/* Features List */}
+              <div className="mt-8 border-t border-gray-200 pt-8">
+                <h3 className="text-gray-600 font-medium mb-4">Why join Leet Daily?</h3>
+                <ul className="space-y-4">
+                  <li className="flex items-center text-gray-600">
+                    <span className="mr-3">🎯</span>
+                    Daily coding challenges to improve your skills
+                  </li>
+                  <li className="flex items-center text-gray-600">
+                    <span className="mr-3">📈</span>
+                    Track your progress and stay motivated
+                  </li>
+                  <li className="flex items-center text-gray-600">
+                    <span className="mr-3">🏆</span>
+                    Compete with others and learn together
+                  </li>
+                  <li className="flex items-center text-gray-600">
+                    <span className="mr-3">🚀</span>
+                    Level up your problem-solving abilities
+                  </li>
+                </ul>
+              </div>
+            </>
+          ) : (
+            <>
+              <form onSubmit={handleAdminLogin} className="space-y-4">
+                <div>
+                  <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                    Email
+                  </label>
+                  <input
+                    type="email"
+                    id="email"
+                    value={adminEmail}
+                    onChange={(e) => setAdminEmail(e.target.value)}
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500"
+                    required
+                  />
+                </div>
+                <div>
+                  <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                    Password
+                  </label>
+                  <input
+                    type="password"
+                    id="password"
+                    value={adminPassword}
+                    onChange={(e) => setAdminPassword(e.target.value)}
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500"
+                    required
+                  />
+                </div>
+                {error && <p className="text-sm text-red-600">{error}</p>}
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-pink-600 hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500 disabled:opacity-50"
+                >
+                  {isLoading ? 'Signing in...' : 'Sign In'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowAdminLogin(false)}
+                  className="w-full text-sm text-gray-500 hover:text-gray-700"
+                >
+                  Back to User Login
+                </button>
+              </form>
+            </>
+          )}
+
+          {/* Footer */}
+          <div className="mt-8 text-center text-sm text-gray-500">
+            By signing in, you agree to our{' '}
+            <a href="#" className="text-pink-600 hover:text-pink-700">
+              Terms of Service
+            </a>{' '}
+            and{' '}
+            <a href="#" className="text-pink-600 hover:text-pink-700">
+              Privacy Policy
+            </a>
           </div>
         </div>
       </div>

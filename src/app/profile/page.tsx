@@ -4,7 +4,6 @@ import { useSession, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import PageLayout from '@/components/PageLayout';
-import { AVATAR_STYLES, generateAvatarUrl } from '@/config/avatars';
 
 interface UserStats {
   totalProblemsSolved: number;
@@ -16,6 +15,24 @@ interface UserStats {
     longest: number;
   };
 }
+
+const AVATAR_STYLES = [
+  { id: 'adventurer', name: 'Adventurer' },
+  { id: 'adventurer-neutral', name: 'Adventurer Neutral' },
+  { id: 'avataaars', name: 'Avataaars' },
+  { id: 'big-ears', name: 'Big Ears' },
+  { id: 'big-ears-neutral', name: 'Big Ears Neutral' },
+  { id: 'big-smile', name: 'Big Smile' },
+  { id: 'bottts', name: 'Bottts' },
+  { id: 'croodles', name: 'Croodles' },
+  { id: 'fun-emoji', name: 'Fun Emoji' },
+  { id: 'icons', name: 'Icons' },
+  { id: 'lorelei', name: 'Lorelei' },
+  { id: 'micah', name: 'Micah' },
+  { id: 'miniavs', name: 'Mini Avatars' },
+  { id: 'personas', name: 'Personas' },
+  { id: 'pixel-art', name: 'Pixel Art' }
+];
 
 export default function ProfilePage() {
   const { data: session, status, update: updateSession } = useSession();
@@ -75,13 +92,13 @@ export default function ProfilePage() {
 
   const handleStyleSelect = (style: string) => {
     setSelectedStyle(style);
-    setPreviewAvatar(generateAvatarUrl(style, session?.user?.id || ''));
+    setPreviewAvatar(`https://api.dicebear.com/7.x/${style}/svg?seed=${session?.user?.id}&backgroundColor=b6e3f4,c0aede,d1d4f9`);
   };
 
   const handleAvatarUpdate = async () => {
     try {
       // Generate and show preview immediately
-      const previewUrl = generateAvatarUrl(selectedStyle, session?.user?.id || '');
+      const previewUrl = `https://api.dicebear.com/7.x/${selectedStyle}/svg?seed=${session?.user?.id}&backgroundColor=b6e3f4,c0aede,d1d4f9`;
       setCurrentAvatar(previewUrl);
 
       const res = await fetch('/api/user/update-avatar', {
@@ -303,23 +320,25 @@ export default function ProfilePage() {
               </button>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-6">
               {AVATAR_STYLES.map((style) => (
                 <button
                   key={style.id}
                   onClick={() => handleStyleSelect(style.id)}
-                  className={`p-4 rounded-xl flex flex-col items-center gap-2 transition-colors ${
+                  className={`p-4 rounded-xl border-2 transition-colors ${
                     selectedStyle === style.id
-                      ? 'bg-pink-100 ring-2 ring-pink-500'
-                      : 'hover:bg-gray-100'
+                      ? 'border-pink-500 bg-pink-50'
+                      : 'border-gray-200 hover:border-pink-200'
                   }`}
                 >
                   <img
-                    src={generateAvatarUrl(style.id, session?.user?.id || '')}
+                    src={`https://api.dicebear.com/7.x/${style.id}/svg?seed=${session?.user?.id}&backgroundColor=b6e3f4,c0aede,d1d4f9`}
                     alt={style.name}
-                    className="w-16 h-16 rounded-full"
+                    className="w-20 h-20 mx-auto mb-2"
                   />
-                  <span className="text-sm text-gray-700">{style.name}</span>
+                  <div className="text-sm text-center font-medium text-gray-700">
+                    {style.name}
+                  </div>
                 </button>
               ))}
             </div>
