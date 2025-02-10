@@ -9,6 +9,7 @@ declare module 'next-auth' {
       role: string;
       avatar: string;
       avatarStyle: string;
+      role?: string;
     }
   }
 
