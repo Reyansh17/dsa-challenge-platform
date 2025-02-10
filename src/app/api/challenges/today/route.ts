@@ -35,13 +35,13 @@ export async function GET() {
 
     // Format challenges and check completion status
     const formattedChallenges = challenges.map(challenge => ({
-      _id: challenge._id.toString(),
+      _id: (challenge._id as { toString(): string }).toString(),
       leetcodeLink: challenge.leetcodeLink,
       difficulty: challenge.difficulty,
-      createdAt: challenge.createdAt.toISOString(),
+      createdAt: (challenge.createdAt as Date).toISOString(),
       submissions: challenge.submissions || [],
       isCompleted: challenge.submissions?.some(
-        sub => sub.userId?.email === session.user.email
+        (sub: { userId?: { email?: string } }) => sub.userId?.email === session.user.email
       ) || false
     }));
 
