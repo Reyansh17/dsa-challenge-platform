@@ -67,6 +67,16 @@ const userSchema = new mongoose.Schema({
   isEligibleForAdmin: {
     type: Boolean,
     default: false
+  },
+  streak: {
+    current: {
+      type: Number,
+      default: 0
+    },
+    longest: {
+      type: Number,
+      default: 0
+    }
   }
 });
 
