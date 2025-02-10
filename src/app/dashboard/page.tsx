@@ -46,10 +46,12 @@ function getDiceBearUrl(style: string, seed: string) {
   return `${baseUrl}/${style}/svg?seed=${encodeURIComponent(seed)}&${options}`;
 }
 
-function formatProblemName(url: string): string {
+const formatProblemName = (url: string): string => {
   try {
-    const problemPath = new URL(url).pathname.split('/').filter(Boolean);
-    const problemName = problemPath[problemPath.length - 1];
+    // Extract problem name from LeetCode URL
+    const problemName = url.split('/problems/')[1]?.split('/')[0];
+    if (!problemName) return 'Unknown Problem';
+    
     // Convert kebab-case to Title Case
     return problemName
       .split('-')
@@ -58,7 +60,7 @@ function formatProblemName(url: string): string {
   } catch {
     return 'Unknown Problem';
   }
-}
+};
 
 export default function Dashboard() {
   const { data: session, status } = useSession();
