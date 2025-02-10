@@ -27,7 +27,16 @@ export async function POST(req: Request) {
       submissions: []
     });
 
-    return NextResponse.json(challenge);
+    // Set cookie in response if needed
+    const response = NextResponse.json(challenge);
+    response.cookies.set('adminSession', 'true', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 24 // 24 hours
+    });
+
+    return response;
   } catch (error) {
     console.error('Error creating challenge:', error);
     return NextResponse.json(
