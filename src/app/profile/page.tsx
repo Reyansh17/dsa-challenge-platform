@@ -45,6 +45,9 @@ export default function ProfilePage() {
   const [isEditingName, setIsEditingName] = useState(false);
   const [newName, setNewName] = useState('');
   const [isUpdating, setIsUpdating] = useState(false);
+  const [currentName, setCurrentName] = useState('');
+  const [displayName, setDisplayName] = useState('');
+  const [currentAvatar, setCurrentAvatar] = useState('');
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -55,10 +58,18 @@ export default function ProfilePage() {
   }, [status, router]);
 
   useEffect(() => {
-    if (session?.user?.name) {
-      setNewName(session.user.name);
+    if (session?.user) {
+      setCurrentName(session.user.name || '');
+      setDisplayName(session.user.name || '');
+      setNewName(session.user.name || '');
     }
-  }, [session?.user?.name]);
+  }, [session]);
+
+  useEffect(() => {
+    if (session?.user?.avatar) {
+      setCurrentAvatar(session.user.avatar);
+    }
+  }, [session?.user?.avatar]);
 
   const fetchUserStats = async () => {
     try {
@@ -86,6 +97,10 @@ export default function ProfilePage() {
 
   const handleAvatarUpdate = async () => {
     try {
+      // Generate and show preview immediately
+      const previewUrl = `https://api.dicebear.com/7.x/${selectedStyle}/svg?seed=${session?.user?.id}&backgroundColor=b6e3f4,c0aede,d1d4f9`;
+      setCurrentAvatar(previewUrl);
+
       const res = await fetch('/api/user/update-avatar', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -94,23 +109,24 @@ export default function ProfilePage() {
 
       if (res.ok) {
         const data = await res.json();
-        
-        // Update the session with new user data
         await updateSession({
+          ...session,
           user: {
             ...session?.user,
             avatar: data.user.avatar,
             avatarStyle: data.user.avatarStyle
           }
         });
-
-        // Close modal
         setShowAvatarModal(false);
       } else {
+        // Revert on error
+        setCurrentAvatar(session?.user?.avatar || '');
         const error = await res.json();
         alert(error.error || 'Failed to update avatar');
       }
     } catch (error) {
+      // Revert on error
+      setCurrentAvatar(session?.user?.avatar || '');
       console.error('Error updating avatar:', error);
       alert('Failed to update avatar. Please try again.');
     }
@@ -124,6 +140,7 @@ export default function ProfilePage() {
       }
 
       setIsUpdating(true);
+      
       const res = await fetch('/api/user/update-profile', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -132,15 +149,13 @@ export default function ProfilePage() {
 
       if (res.ok) {
         const data = await res.json();
-        
-        // Update session with new user data
         await updateSession({
+          ...session,
           user: {
             ...session?.user,
-            name: data.user.name
+            name: newName.trim()
           }
         });
-        
         setIsEditingName(false);
       } else {
         const error = await res.json();
@@ -152,6 +167,11 @@ export default function ProfilePage() {
     } finally {
       setIsUpdating(false);
     }
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditingName(false);
+    setNewName(currentName);
   };
 
   if (isLoading) {
@@ -173,7 +193,7 @@ export default function ProfilePage() {
             <div className="flex items-center gap-8">
               <div className="relative group cursor-pointer" onClick={handleAvatarClick}>
                 <img
-                  src={session?.user?.avatar || '/default-avatar.png'}
+                  src={currentAvatar || '/default-avatar.png'}
                   alt={session?.user?.name || 'Profile'}
                   className="w-32 h-32 rounded-full object-cover ring-4 ring-pink-200 group-hover:opacity-75 transition-opacity"
                 />
@@ -205,10 +225,7 @@ export default function ProfilePage() {
                         {isUpdating ? 'Saving...' : 'Save'}
                       </button>
                       <button
-                        onClick={() => {
-                          setIsEditingName(false);
-                          setNewName(session?.user?.name || '');
-                        }}
+                        onClick={handleCancelEdit}
                         className="px-4 py-2 text-gray-600 hover:text-gray-800"
                       >
                         Cancel
@@ -217,7 +234,7 @@ export default function ProfilePage() {
                   ) : (
                     <>
                       <h1 className="text-3xl font-bold text-gray-900">
-                        {session?.user?.name}
+                        {displayName}
                       </h1>
                       <button
                         onClick={() => setIsEditingName(true)}

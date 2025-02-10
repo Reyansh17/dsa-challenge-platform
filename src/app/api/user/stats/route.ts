@@ -17,11 +17,17 @@ export async function GET() {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
+    // Get user's rank
+    const rank = await User.countDocuments({
+      totalProblemsSolved: { $gt: user.totalProblemsSolved }
+    }) + 1;
+
     return NextResponse.json({
       totalProblemsSolved: user.totalProblemsSolved,
       easySolved: user.easySolved,
       mediumSolved: user.mediumSolved,
       hardSolved: user.hardSolved,
+      rank,
       streak: {
         current: user.streak?.current || 0,
         longest: user.streak?.longest || 0

@@ -3,12 +3,38 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useSession, signOut } from 'next-auth/react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function Sidebar() {
   const pathname = usePathname();
   const { data: session } = useSession();
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [stats, setStats] = useState({
+    rank: 0,
+    totalSolved: 0
+  });
+
+  // Fetch user stats
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const res = await fetch('/api/user/stats');
+        if (res.ok) {
+          const data = await res.json();
+          setStats({
+            rank: data.rank || 0,
+            totalSolved: data.totalProblemsSolved || 0
+          });
+        }
+      } catch (error) {
+        console.error('Error fetching stats:', error);
+      }
+    };
+
+    if (session?.user) {
+      fetchStats();
+    }
+  }, [session]);
 
   const handleLogout = async () => {
     try {
@@ -113,11 +139,15 @@ export default function Sidebar() {
           <div className="space-y-4">
             <div className="bg-[#f0f9f6] p-4 rounded-xl">
               <div className="text-sm text-gray-600 mb-1">Your Rank</div>
-              <div className="text-2xl font-bold text-[#0ca678]">#1</div>
+              <div className="text-2xl font-bold text-[#0ca678]">
+                #{stats.rank || '-'}
+              </div>
             </div>
             <div className="bg-[#f0f9f6] p-4 rounded-xl">
               <div className="text-sm text-gray-600 mb-1">Problems Solved</div>
-              <div className="text-2xl font-bold text-[#0ca678]">42</div>
+              <div className="text-2xl font-bold text-[#0ca678]">
+                {stats.totalSolved}
+              </div>
             </div>
           </div>
         </div>

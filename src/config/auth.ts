@@ -99,32 +99,45 @@ export const authOptions: AuthOptions = {
         return false;
       }
     },
-    async jwt({ token, user }) {
-      if (user) {
-        token.id = user.id;
-        token.role = user.role;
-        token.name = user.name;
-        token.avatar = user.avatar;
-        token.avatarStyle = user.avatarStyle;
-      }
-      return token;
-    },
     async session({ session, token }) {
       if (session?.user) {
         session.user = {
           id: token.id as string,
           name: token.name as string,
           email: token.email as string,
-          image: token.picture as string,
-          totalProblemsSolved: 0,
-          easySolved: 0, 
-          mediumSolved: 0,
-          hardSolved: 0,
-          isAdminToday: false,
-          isEligibleForAdmin: false
+          avatar: token.avatar as string,
+          avatarStyle: token.avatarStyle as string,
+          role: token.role as string,
+          totalProblemsSolved: token.totalProblemsSolved as number,
+          easySolved: token.easySolved as number,
+          mediumSolved: token.mediumSolved as number,
+          hardSolved: token.hardSolved as number,
+          isAdminToday: token.isAdminToday as boolean,
+          isEligibleForAdmin: token.isEligibleForAdmin as boolean
         };
       }
       return session;
+    },
+    async jwt({ token, user, trigger, session }) {
+      if (trigger === "update" && session?.user) {
+        // Update token with new session data
+        token = { ...token, ...session.user };
+      }
+      if (user) {
+        token.id = user.id;
+        token.name = user.name;
+        token.email = user.email;
+        token.avatar = user.avatar;
+        token.avatarStyle = user.avatarStyle;
+        token.role = user.role;
+        token.totalProblemsSolved = user.totalProblemsSolved;
+        token.easySolved = user.easySolved;
+        token.mediumSolved = user.mediumSolved;
+        token.hardSolved = user.hardSolved;
+        token.isAdminToday = user.isAdminToday;
+        token.isEligibleForAdmin = user.isEligibleForAdmin;
+      }
+      return token;
     }
   },
   pages: {
