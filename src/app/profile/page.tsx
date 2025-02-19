@@ -284,23 +284,7 @@ export default function ProfilePage() {
           </div>
 
           {/* Streak Info */}
-          <div className="bg-white rounded-2xl p-6 shadow-lg">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Streak Stats</h2>
-            <div className="grid grid-cols-2 gap-6">
-              <div>
-                <div className="text-sm text-gray-500 mb-1">Current Streak</div>
-                <div className="text-3xl font-bold text-yellow-500">
-                  {stats?.streak?.current || 0} days
-                </div>
-              </div>
-              <div>
-                <div className="text-sm text-gray-500 mb-1">Longest Streak</div>
-                <div className="text-3xl font-bold text-pink-500">
-                  {stats?.streak?.longest || 0} days
-                </div>
-              </div>
-            </div>
-          </div>
+         
         </div>
       </div>
 

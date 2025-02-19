@@ -56,6 +56,11 @@ const userSchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
+  points: {
+    type: Number,
+    default: 0,
+    required: true
+  },
   avatarStyle: {
     type: String,
     enum: ['adventurer', 'avataaars', 'bottts', 'fun-emoji', 'lorelei', 'micah'],
@@ -69,6 +74,10 @@ const userSchema = new mongoose.Schema({
     default: false
   },
   streak: {
+    __v: {
+      type: Number,
+      default: 0
+    },
     current: {
       type: Number,
       default: 0
@@ -78,6 +87,14 @@ const userSchema = new mongoose.Schema({
       default: 0
     }
   }
+});
+
+// Add a pre-save hook to ensure points exist
+userSchema.pre('save', function(next) {
+  if (this.points === undefined) {
+    this.points = 0;
+  }
+  next();
 });
 
 // Drop all indexes and recreate only the email index
@@ -96,8 +113,10 @@ dropIndexes();
 // Add only the email index
 userSchema.index({ email: 1 });
 
-// Clean up any existing model to prevent duplicate model error
-mongoose.models = {};
+// Clean up existing models
+Object.keys(mongoose.models).forEach(key => {
+  delete mongoose.models[key];
+});
 
 const User = mongoose.model('User', userSchema);
 

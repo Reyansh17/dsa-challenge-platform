@@ -1,69 +1,39 @@
 import { NextResponse } from 'next/server';
-import connectDB from '@/utils/db';
-import User from '@/models/user';
+import { MongoClient } from 'mongodb';
 
-export async function GET(req: Request) {
+export async function GET() {
   try {
-    const { searchParams } = new URL(req.url);
-    const filter = searchParams.get('filter') || 'all-time';
+    const client = await MongoClient.connect(process.env.MONGO_URI || '');
+    const db = client.db();
 
-    await connectDB();
+    // Get users with their solved problems
+    const users = await db.collection('users')
+      .find({})
+      .project({
+        name: 1,
+        email: 1,
+        avatar: 1,
+        totalProblemsSolved: 1,
+        easySolved: 1,
+        mediumSolved: 1,
+        hardSolved: 1
+      })
+      .sort({ totalProblemsSolved: -1 })  // Sort by problems solved
+      .toArray();
 
-    // Build date filter
-    let dateFilter = {};
-    const now = new Date();
-    if (filter === 'this-week') {
-      const startOfWeek = new Date(now);
-      startOfWeek.setDate(now.getDate() - now.getDay());
-      dateFilter = { createdAt: { $gte: startOfWeek } };
-    } else if (filter === 'this-month') {
-      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-      dateFilter = { createdAt: { $gte: startOfMonth } };
-    }
+    // Calculate points based on totalProblemsSolved
+    const usersWithPoints = users.map(user => ({
+      ...user,
+      points: (user.totalProblemsSolved || 0) * 100
+    }));
 
-    const users = await User.find({
-      role: { $ne: 'admin' },
-      ...dateFilter
-    }).select({
-      _id: 1,
-      name: 1,
-      email: 1,
-      totalProblemsSolved: 1,
-      easySolved: 1,
-      mediumSolved: 1,
-      hardSolved: 1,
-      avatarStyle: 1
-    }).sort({
-      totalProblemsSolved: -1,
-      hardSolved: -1,
-      mediumSolved: -1,
-      easySolved: -1
-    }).limit(100);
+    await client.close();
+    return NextResponse.json(usersWithPoints);
 
-    // Format the response with proper avatar URLs
-    const formattedUsers = users.map(user => {
-      const style = user.avatarStyle || 'initials';
-      const seed = user._id.toString();
-      const bgColors = 'b6e3f4,c0aede,d1d4f9';
-      
-      return {
-        _id: user._id.toString(),
-        name: user.name || 'Anonymous',
-        email: user.email,
-        totalProblemsSolved: user.totalProblemsSolved || 0,
-        easySolved: user.easySolved || 0,
-        mediumSolved: user.mediumSolved || 0,
-        hardSolved: user.hardSolved || 0,
-        avatar: `https://api.dicebear.com/7.x/${style}/svg?seed=${seed}&backgroundColor=${bgColors}`,
-        avatarStyle: style
-      };
-    });
-
-    return NextResponse.json(formattedUsers);
   } catch (error) {
     console.error('Error fetching leaderboard:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch leaderboard' },
+      { message: 'Failed to fetch leaderboard' },
       { status: 500 }
     );
   }

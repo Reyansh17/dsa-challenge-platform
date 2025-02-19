@@ -15,6 +15,7 @@ interface LeaderboardUser {
   easySolved: number;
   mediumSolved: number;
   hardSolved: number;
+  points: number;
 }
 
 export default function LeaderboardPage() {
@@ -167,7 +168,7 @@ export default function LeaderboardPage() {
                           {/* Score */}
                           <div className="text-right">
                             <div className="text-2xl font-bold text-purple-600">
-                              {user.totalProblemsSolved * 100}
+                              {user.points}
                             </div>
                             <div className="text-sm text-gray-500">points</div>
                           </div>

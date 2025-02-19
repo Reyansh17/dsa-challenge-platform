@@ -92,6 +92,37 @@ export default function AdminDashboard() {
     }
   };
 
+  const resetAllPoints = async () => {
+    if (!confirm('Are you sure you want to reset all student points to 0? This action cannot be undone.')) {
+      return;
+    }
+
+    try {
+      console.log('Sending reset request...');
+      const response = await fetch('/api/admin/reset-points', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
+
+      const data = await response.json();
+      console.log('Reset response:', data);
+
+      if (!response.ok) {
+        throw new Error(data.message || data.error || 'Failed to reset points');
+      }
+
+      toast.success(`Successfully reset points for ${data.updated} out of ${data.totalUsers} users`);
+      // Optionally refresh the page or update the UI
+      window.location.reload();
+    } catch (error) {
+      console.error('Error resetting points:', error);
+      toast.error(error instanceof Error ? error.message : 'Failed to reset points');
+    }
+  };
+
   if (status === 'loading' || isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-pink-100 to-pink-200 flex items-center justify-center">
@@ -107,13 +138,19 @@ export default function AdminDashboard() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-100 to-pink-200">
       <div className="max-w-6xl mx-auto p-8">
-        {/* Header */}
+        {/* Header with Reset Button */}
         <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Admin Panel</h1>
             <p className="text-gray-600 mt-1">Post and manage daily challenges</p>
           </div>
           <div className="flex items-center gap-4">
+            <button
+              onClick={resetAllPoints}
+              className="px-6 py-3 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-colors"
+            >
+              Reset All Problem Counts
+            </button>
             <button
               onClick={() => setShowPostModal(true)}
               className="px-6 py-3 bg-pink-600 text-white rounded-xl hover:bg-pink-700 transition-colors"
@@ -190,7 +227,7 @@ export default function AdminDashboard() {
               <div className="text-center py-12">
                 <div className="text-gray-400 text-lg mb-2">No challenges posted yet</div>
                 <div className="text-gray-500 text-sm">
-                  Click the "Post New Challenge" button to add your first challenge
+                  Click the &quot;Post New Challenge&quot; button to add your first challenge
                 </div>
               </div>
             )}
